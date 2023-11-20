@@ -2,9 +2,10 @@
 import logging
 from dataclasses import dataclass
 import pandas as pd
-from xtgeo import gridproperty_from_roxar, surface_from_roxar, RoxUtils
+from xtgeo import gridproperty_from_roxar, surface_from_roxar
 from fmu.dataio import ExportData
 from fmu.config.utilities import yaml_load
+import utils
 import roxar
 import roxar.jobs
 
@@ -32,11 +33,6 @@ RENAME_VOLUMES = {
     "Net": "NET_TOTAL",
     "Pore": "PORV_TOTAL",
 }
-
-
-def _get_project(project, readonly):
-    project = RoxUtils(project, readonly=readonly).project
-    return project
 
 
 def _define_prefixes(out_input):
@@ -258,13 +254,10 @@ class RmsInplaceVolumes:
 
     def __post_init__(self):
         """Initialize what is not initialized upfront"""
-        job = roxar.jobs.Job.get_job(
-            owner=["Grid models", self.grid_name, "Grid"],
-            type="Volumetrics",
-            name=self.job_name,
+        self.params = utils.get_job_arguments(
+            ["Grid models", self.grid_name, "Grid"], "Volumetrics", self.job_name
         )
-        self.project = _get_project(self.project, True)
-        self.params = job.get_arguments()
+        self.project = utils._get_project(self.project, True)
         self.input = self.params["Input"][0]
         self.output = self.params["Output"][0]
         self.variables = self.params["Variables"][0]
@@ -281,3 +274,37 @@ class RmsInplaceVolumes:
         _export_collection(
             self.project, self.report_output, self.grid_name, self.job_name
         )
+
+
+@dataclass
+class RmsGrid:
+    """Class for exporting data Grid"""
+
+    project: str
+    grid_name: str
+    job_name: str
+    params: dict = None
+
+    def __post_init__(self):
+        """Initialize what is not initialized upfront"""
+        self.params = utils.get_job_arguments(
+            ["Grid models", self.grid_name, "Grid"], "Create Grid", self.job_name
+        )
+        self.project = utils._get_project(self.project, True)
+
+
+@dataclass
+class RmsGrid:
+    """Class for exporting data Grid"""
+
+    project: str
+    grid_name: str
+    job_name: str
+    params: dict = None
+
+    def __post_init__(self):
+        """Initialize what is not initialized upfront"""
+        self.params = utils.get_job_arguments(
+            ["Grid models", self.grid_name, "Grid"], "Create Grid", self.job_name
+        )
+        self.project = utils._get_project(self.project, True)
