@@ -5,7 +5,7 @@ import pandas as pd
 from xtgeo import gridproperty_from_roxar, surface_from_roxar
 from fmu.dataio import ExportData
 from fmu.config.utilities import yaml_load
-import utils
+import dataio.utils as utils
 import roxar
 import roxar.jobs
 
@@ -250,7 +250,6 @@ class RmsInplaceVolumes:
     project: str
     grid_name: str
     job_name: str
-    params: dict = None
 
     def __post_init__(self):
         """Initialize what is not initialized upfront"""
