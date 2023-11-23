@@ -1,0 +1,1 @@
+from dataio.structure.structuralmodel import RmsStructuralModel
